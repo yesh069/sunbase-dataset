@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Your Application</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div id="login" class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">Login</div>
+            <div class="card-body">
+              <form id="loginForm">
+                <div class="form-group">
+                  <label for="username">Username:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="password">Password:</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    required
+                  />
+                </div>
+                <button type="button" class="btn btn-primary" onclick="login()">
+                  Login
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer List Screen -->
+    <div class="container mt-5 hidden" id="customerListScreen">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Customer List</h2>
+          <table id="customerTable" class="table">
+            <!-- Table headers -->
+            <thead>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Street</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <!-- Table body -->
+            <tbody>
+              <!-- Customer data will be added dynamically here using JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add a New Customer Screen -->
+    <div class="container mt-5 hidden" id="addCustomerScreen">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Add a New Customer</div>
+            <div class="card-body">
+              <form id="newCustomerForm">
+                <div class="mb-3">
+                  <label for="newFirstName" class="form-label"
+                    >First Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newFirstName"
+                    placeholder="Jane"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newLastName" class="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newLastName"
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newStreet" class="form-label">Street</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newStreet"
+                    placeholder="Elvnu Street"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newAddress" class="form-label">Address</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newAddress"
+                    placeholder="H no 2"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newCity" class="form-label">City</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newCity"
+                    placeholder="Delhi"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newState" class="form-label">State</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newState"
+                    placeholder="Delhi"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newEmail" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="newEmail"
+                    placeholder="sam@gmail.com"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="newPhone" class="form-label">Phone</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="newPhone"
+                    placeholder="12345678"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  onclick="addCustomer()"
+                >
+                  Add Customer
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Check if jQuery is properly loaded
+      if (typeof fetch == "undefined") {
+        throw new Error("Fetch API is not loaded.");
+      }
+
+      function login() {
+        const username = document.querySelector("#username").value;
+        const password = document.querySelector("#password").value;
+
+        fetch(
+          "https://corsproxy.io/?https://qa2.sunbasedata.com/sunbase/portal/api/assignment_auth.jsp",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              login_id: username,
+              password: password,
+            }),
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // Save the token and show the customer list screen
+            window.apiToken = data.access_token;
+            document
+              .querySelector("#customerListScreen")
+              .classList.remove("hidden");
+            document
+              .querySelector("#addCustomerScreen")
+              .classList.remove("hidden");
+            document.querySelector("#login").classList.add("hidden");
+            // Store the token for future API calls
+            getCustomerList();
+          })
+          .catch((error) => {
+            console.error("Authentication error:", error);
+            // Handle authentication error, show an alert, etc.
+          });
+      }
+      // Function to create a new customer
+      function addCustomer() {
+        const firstName = document.querySelector("#newFirstName").value;
+        const lastName = document.querySelector("#newLastName").value;
+        const street = document.querySelector("#newStreet").value;
+        const address = document.querySelector("#newAddress").value;
+        const city = document.querySelector("#newCity").value;
+        const state = document.querySelector("#newState").value;
+        const email = document.querySelector("#newEmail").value;
+        const phone = document.querySelector("#newPhone").value;
+
+        // Check if mandatory parameters are present
+        if (!firstName || !lastName) {
+          alert("First Name or Last Name is missing.");
+          return;
+        }
+
+        // Make the API call to create a new customer
+        fetch(
+          "https://corsproxy.io/?https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=create",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + window.apiToken,
+            },
+            body: JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              street: street,
+              address: address,
+              city: city,
+              state: state,
+              email: email,
+              phone: phone,
+            }),
+          }
+        )
+          .then((response) => {
+            if (response.status === 201) {
+              alert("Successfully Created");
+              // You may want to refresh the customer list after adding a new customer
+              getCustomerList();
+            } else {
+              alert("Failed to create customer.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error creating customer:", error);
+          });
+      }
+      const customerTable = document.querySelector("#customerTable");
+
+      function populateCustomerTable(customerList) {
+        // Clear existing table content
+        customerTable.innerHTML = "";
+
+        // Iterate through the customerList and append rows to the table
+        customerList.forEach((customer) => {
+          const row = customerTable.insertRow();
+          row.dataset.uuid = customer.uuid;
+          // Add cells and populate them with customer data
+          const firstNameCell = row.insertCell(0);
+          const lastNameCell = row.insertCell(1);
+          const streetCell = row.insertCell(2);
+          const addressCell = row.insertCell(3);
+          const cityCell = row.insertCell(4);
+          const stateCell = row.insertCell(5);
+          const emailCell = row.insertCell(6);
+          const phoneCell = row.insertCell(7);
+          const actionCell = row.insertCell(8);
+          const actionCell2 = row.insertCell(9);
+          firstNameCell.textContent = customer.first_name;
+          lastNameCell.textContent = customer.last_name;
+          streetCell.textContent = customer.street;
+          addressCell.textContent = customer.address;
+          cityCell.textContent = customer.city;
+          stateCell.textContent = customer.state;
+          emailCell.textContent = customer.email;
+          phoneCell.textContent = customer.phone;
+
+          // Add a delete button with an onclick event to trigger the deleteCustomer function
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.className = "btn btn-danger btn-sm";
+          deleteButton.onclick = function () {
+            const temp = customer.uuid;
+            deleteCustomer(temp);
+          };
+          actionCell.appendChild(deleteButton);
+
+          const editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.className = "btn btn-primary btn-sm";
+          editButton.onclick = function () {
+            makeRowEditable(row);
+          };
+          actionCell2.appendChild(editButton);
+        });
+      }
+      // Function to get the customer list
+      function getCustomerList() {
+        fetch(
+          "https://corsproxy.io/?https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=get_customer_list",
+          {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + window.apiToken,
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // Populate the customer table with the retrieved data
+            populateCustomerTable(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching customer list:", error);
+          });
+      }
+
+      // Function to delete a customer
+      function deleteCustomer(uuid) {
+        fetch(
+          "https://corsproxy.io/?https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=delete&uuid=" +
+            uuid,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + window.apiToken,
+            },
+          }
+        )
+          .then((response) => {
+            if (response.status === 200) {
+              alert("Successfully Deleted");
+              // You may want to refresh the customer list after deleting a customer
+              getCustomerList();
+            } else {
+              alert("Failed to delete customer.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting customer:", error);
+          });
+      }
+
+      function makeRowEditable(row) {
+        const cells = row.cells;
+
+        // Iterate through cells, excluding the last two action cells
+        for (let i = 0; i < cells.length - 2; i++) {
+          const cell = cells[i];
+          const text = cell.textContent;
+
+          // Create an input element with the current cell's text content
+          const input = document.createElement("input");
+          input.value = text;
+
+          // Replace the cell's content with the input element
+          cell.textContent = "";
+          cell.appendChild(input);
+        }
+
+        // Hide the "Edit" button
+        row.cells[row.cells.length - 1].style.display = "none";
+
+        // Create a "Save" button and append it to the last cell
+        const saveButton = document.createElement("button");
+        saveButton.textContent = "Save";
+        saveButton.className = "btn btn-success btn-sm";
+        saveButton.onclick = function () {
+          saveRowData(row);
+        };
+
+        row.cells[row.cells.length - 2].appendChild(saveButton);
+      }
+
+      // Function to save the edited row data
+      function saveRowData(row) {
+        const cells = row.cells;
+        const uuid = row.dataset.uuid; // Assuming you store the uuid in a data attribute
+        const updatedData = {
+          first_name: cells[0].querySelector("input").value,
+          last_name: cells[1].querySelector("input").value,
+          street: cells[2].querySelector("input").value,
+          address: cells[3].querySelector("input").value,
+          city: cells[4].querySelector("input").value,
+          state: cells[5].querySelector("input").value,
+          email: cells[6].querySelector("input").value,
+          phone: cells[7].querySelector("input").value,
+        };
+
+        // Make the API call to update customer data
+        fetch(
+          "https://corsproxy.io/?https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=update&uuid=" +
+            uuid,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + window.apiToken,
+            },
+            body: JSON.stringify({
+              ...updatedData,
+            }),
+          }
+        )
+          .then((response) => {
+            if (response.status === 200) {
+              alert("Successfully Updated");
+              // Refresh the customer list after updating data
+              getCustomerList();
+            } else {
+              alert("Failed to update customer data.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating customer data:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
